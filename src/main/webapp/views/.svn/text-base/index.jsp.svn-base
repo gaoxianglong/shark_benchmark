@@ -1,0 +1,11 @@
+<%@ page language="java" pageEncoding="utf-8"%>
+<html>
+<head>
+<title>wxzc um子系统</title>
+</head>
+<body>
+	<div align="center">
+		<font size="5">um子系统</font>
+	</div>
+</body>
+</html>

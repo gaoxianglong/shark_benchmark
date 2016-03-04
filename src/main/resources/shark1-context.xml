@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+	http://www.springframework.org/schema/beans/spring-beans-3.2.xsd 
+	http://www.springframework.org/schema/aop
+	http://www.springframework.org/schema/aop/spring-aop-3.2.xsd
+	http://www.springframework.org/schema/context
+	http://www.springframework.org/schema/context/spring-context-3.2.xsd">
+	<aop:aspectj-autoproxy proxy-target-class="true" />
+	<context:component-scan base-package="com.gxl.shark">
+		<context:include-filter type="annotation"
+			expression="org.aspectj.lang.annotation.Aspect" />
+	</context:component-scan>
+	<bean class="com.gxl.shark.benchmark.Benchmark" init-method="init">
+		<constructor-arg index="0" value="10" />
+		<constructor-arg index="1" value="10000" />
+		<constructor-arg index="2" ref="jdbcTemplate" />
+	</bean>
+	<!-- 片名连续的库内分片 -->
+	<bean id="jdbcTemplate" class="com.gxl.shark.core.shard.SharkJdbcTemplate">
+		<constructor-arg name="isShard" value="true" />
+		<property name="dataSource" ref="dataSourceGroup" />
+		<property name="wr_index" value="r0w0" />
+		<property name="shardMode" value="false" />
+		<property name="consistent" value="true" />
+		<property name="dbRuleArray" value="#b_id# % 4 / 2" />
+		<property name="tbRuleArray" value="#b_id# % 4 % 2" />
+		<property name="tbSuffix" value="_0000" />
+	</bean>
+	<bean id="dataSourceGroup" class="com.gxl.shark.core.config.SharkDatasourceGroup">
+		<property name="targetDataSources">
+			<map key-type="java.lang.Integer">
+				<entry key="0" value-ref="dataSource1" />
+				<entry key="1" value-ref="dataSource2" />
+			</map>
+		</property>
+	</bean>
+	<bean id="dataSource1" class="com.alibaba.druid.pool.DruidDataSource"
+		init-method="init" destroy-method="close">
+		<property name="username" value="root" />
+		<property name="password"
+			value="GNKlKofgOB2KlM3TzIvXgoZbyUWhmhadBfsD2+9AUvxuT6Lo6f8AxkNj5/A5buUj3Msx/2eissZqYRYlZ2dNUA==" />
+		<property name="url" value="jdbc:mysql://ip:3306/db_0000" />
+		<property name="initialSize" value="10" />
+		<property name="minIdle" value="100" />
+		<property name="maxActive" value="200" />
+		<property name="poolPreparedStatements" value="false" />
+		<property name="maxOpenPreparedStatements" value="-1" />
+		<property name="testOnBorrow" value="false" />
+		<property name="testOnReturn" value="false" />
+		<property name="testWhileIdle" value="true" />
+		<property name="filters" value="mergeStat,log4j,config" />
+		<property name="connectionProperties" value="config.decrypt=true" />
+		<property name="useGlobalDataSourceStat" value="false" />
+		<property name="timeBetweenLogStatsMillis" value="300000" />
+	</bean>
+	<bean id="dataSource2" class="com.alibaba.druid.pool.DruidDataSource"
+		init-method="init" destroy-method="close">
+		<property name="username" value="root" />
+		<property name="password"
+			value="GNKlKofgOB2KlM3TzIvXgoZbyUWhmhadBfsD2+9AUvxuT6Lo6f8AxkNj5/A5buUj3Msx/2eissZqYRYlZ2dNUA==" />
+		<property name="url" value="jdbc:mysql://ip:3306/db_0001" />
+		<property name="initialSize" value="10" />
+		<property name="minIdle" value="50" />
+		<property name="maxActive" value="200" />
+		<property name="poolPreparedStatements" value="false" />
+		<property name="maxOpenPreparedStatements" value="-1" />
+		<property name="testOnBorrow" value="false" />
+		<property name="testOnReturn" value="false" />
+		<property name="testWhileIdle" value="true" />
+		<property name="filters" value="mergeStat,log4j,config" />
+		<property name="connectionProperties" value="config.decrypt=true" />
+		<property name="useGlobalDataSourceStat" value="false" />
+		<property name="timeBetweenLogStatsMillis" value="300000" />
+	</bean>
+</beans>
